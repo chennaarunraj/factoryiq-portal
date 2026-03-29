@@ -1,0 +1,50 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: jira-sync-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/portaldb
+    username: portaluser
+    password: portalpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: portal
+
+  flyway:
+    enabled: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/manufacturing-portal
+
+# ─────────────────────────────────────────
+# Jira Configuration
+# ─────────────────────────────────────────
+jira:
+  mock-mode: true           # Set to false when you have real Jira
+  base-url: https://your-company.atlassian.net
+  api-token: your-api-token-here
+  user-email: your-email@company.com
+  project-key: MFG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.portal.jira: DEBUG

@@ -1,0 +1,221 @@
+{
+  "realm": "manufacturing-portal",
+  "displayName": "Manufacturing Excellence Portal",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 3600,
+  "refreshTokenMaxReuse": 0,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+
+  "roles": {
+    "realm": [
+      { "name": "ADMIN",                      "description": "Portal Administrator" },
+      { "name": "CUSTOMER_ENGINEERING",        "description": "Customer - Engineering team" },
+      { "name": "CUSTOMER_SUPPLY_CHAIN",       "description": "Customer - Supply Chain / Procurement" },
+      { "name": "CUSTOMER_QUALITY",            "description": "Customer - Quality / Compliance" },
+      { "name": "CUSTOMER_PROGRAM_MANAGER",    "description": "Customer - Program / Project Management" },
+      { "name": "CUSTOMER_AFTER_SALES",        "description": "Customer - After Sales / Service" },
+      { "name": "INTERNAL_ACCOUNT_MANAGER",    "description": "Internal - Customer Success / Account Team" },
+      { "name": "INTERNAL_PRODUCTION",         "description": "Internal - Production Planning & Mfg Ops" },
+      { "name": "INTERNAL_QUALITY",            "description": "Internal - Quality Engineering" },
+      { "name": "INTERNAL_LOGISTICS",          "description": "Internal - Logistics / Supply Chain" },
+      { "name": "INTERNAL_SERVICE",            "description": "Internal - Service / Repair" }
+    ]
+  },
+
+  "groups": [
+    {
+      "name": "internal-users",
+      "path": "/internal-users",
+      "realmRoles": [
+        "INTERNAL_ACCOUNT_MANAGER",
+        "INTERNAL_PRODUCTION",
+        "INTERNAL_QUALITY",
+        "INTERNAL_LOGISTICS",
+        "INTERNAL_SERVICE"
+      ]
+    },
+    {
+      "name": "customer-users",
+      "path": "/customer-users",
+      "realmRoles": [
+        "CUSTOMER_ENGINEERING",
+        "CUSTOMER_SUPPLY_CHAIN",
+        "CUSTOMER_QUALITY",
+        "CUSTOMER_PROGRAM_MANAGER",
+        "CUSTOMER_AFTER_SALES"
+      ]
+    },
+    {
+      "name": "admins",
+      "path": "/admins",
+      "realmRoles": ["ADMIN"]
+    }
+  ],
+
+  "clients": [
+    {
+      "clientId": "portal-frontend",
+      "name": "Manufacturing Portal - Frontend",
+      "description": "React SPA frontend client",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:5173"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ]
+    },
+    {
+      "clientId": "portal-backend",
+      "name": "Manufacturing Portal - Backend Services",
+      "description": "Backend microservices client (confidential)",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocol": "openid-connect",
+      "secret": "portal-backend-secret",
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ]
+    }
+  ],
+
+  "clientScopes": [
+    {
+      "name": "roles",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "customer id mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "customerId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "customerId",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin-user",
+      "email": "admin@portal.com",
+      "firstName": "Portal",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"],
+      "groups": ["/admins"]
+    },
+    {
+      "username": "internal-manager",
+      "email": "manager@portal.com",
+      "firstName": "Account",
+      "lastName": "Manager",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Internal@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["INTERNAL_ACCOUNT_MANAGER"],
+      "groups": ["/internal-users"]
+    },
+    {
+      "username": "customer-engineer",
+      "email": "engineer@acme.com",
+      "firstName": "Acme",
+      "lastName": "Engineer",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Customer@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CUSTOMER_ENGINEERING"],
+      "groups": ["/customer-users"],
+      "attributes": {
+        "customerId": ["CUST-001"]
+      }
+    }
+  ],
+
+  "passwordPolicy": "length(8) and digits(1) and upperCase(1) and specialChars(1)",
+
+  "smtpServer": {},
+
+  "browserSecurityHeaders": {
+    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "xContentTypeOptions": "nosniff",
+    "xRobotsTag": "none",
+    "xFrameOptions": "SAMEORIGIN",
+    "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+  }
+}
