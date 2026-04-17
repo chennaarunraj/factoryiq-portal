@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["jdk21", "maven"]
+nixPkgs = ["temurin-bin-21", "maven"]
 
 [phases.install]
 cmds = ["mvn -N install"]
