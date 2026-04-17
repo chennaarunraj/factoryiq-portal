@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["openjdk21", "maven"]
+
+[phases.build]
+cmds = ["cd backend/program-service && mvn clean package -DskipTests"]
+
+[start]
+cmd = "cd backend/program-service && java -jar target/program-service-1.0.0-SNAPSHOT.jar"
