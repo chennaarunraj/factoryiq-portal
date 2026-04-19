@@ -1,5 +1,2 @@
 [build]
-# Build context is set to backend/ so Docker can access the parent pom.xml
-# alongside the program-service/ subdirectory.
-buildContext = "backend"
 dockerfilePath = "backend/program-service/Dockerfile"
